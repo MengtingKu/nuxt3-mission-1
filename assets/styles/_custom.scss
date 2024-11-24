@@ -1,0 +1,24 @@
+body {
+  letter-spacing: 0.02em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: 0.05em;
+}
+
+
+// activate responsive font size utilities e.g. fs-md-1, fs-lg-2
+$utilities: map-merge(
+  $utilities,
+  (
+    "font-size": map-merge(
+      map-get($utilities, "font-size"),
+      (
+          responsive: true,
+          property: font-size,
+          values: $font-sizes
+      )
+    )
+  )
+);
+

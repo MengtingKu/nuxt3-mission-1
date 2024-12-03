@@ -50,15 +50,10 @@ export default defineNuxtConfig({
         },
     },
     css: ['@/assets/styles/all.scss'],
-    vite: {
-        css: {
-            preprocessorOptions: {
-                scss: {
-                    api: 'modern-compiler',
-                    quietDeps: true,
-                    silenceDeprecations: ['import'],
-                },
-            },
+    postcss: {
+        // CSS 屬性加上瀏覽器相容性前綴
+        plugins: {
+            autoprefixer: {},
         },
     },
     /**

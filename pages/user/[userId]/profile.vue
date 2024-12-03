@@ -10,6 +10,13 @@
 
 const isEditPassword = ref(false);
 const isEditProfile = ref(false);
+
+// seo
+const { title } = useSetMetaTitle();
+
+useSeoMeta({
+    title: title('個人資料'),
+});
 </script>
 
 <template>

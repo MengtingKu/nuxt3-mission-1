@@ -11,6 +11,13 @@ import { Icon } from '@iconify/vue';
 
 const datePickerModal = ref(null);
 
+// seo
+const { title } = useSetMetaTitle();
+
+useSeoMeta({
+    title: title('房型詳細'),
+});
+
 const openModal = () => {
     datePickerModal.value.openModal();
 };
@@ -596,15 +603,15 @@ const handleDateChange = bookingInfo => {
                             <h5 class="mb-0 text-primary-100 fw-bold">
                                 NT$ 10,000
                             </h5>
-                            <RouterLink
+                            <NuxtLink
                                 :to="{
-                                    name: 'booking',
+                                    name: 'rooms-roomId-booking',
                                     params: { roomId: $route.params.roomId },
                                 }"
                                 class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3"
                             >
                                 立即預訂
-                            </RouterLink>
+                            </NuxtLink>
                         </div>
                     </div>
                 </div>
@@ -640,7 +647,7 @@ const handleDateChange = bookingInfo => {
                             }}</span
                         >
                     </div>
-                    <RouterLink
+                    <NuxtLink
                         :to="{
                             name: 'booking',
                             params: { roomId: $route.params.roomId },
@@ -648,7 +655,7 @@ const handleDateChange = bookingInfo => {
                         class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3"
                     >
                         立即預訂
-                    </RouterLink>
+                    </NuxtLink>
                 </template>
             </div>
         </section>

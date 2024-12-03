@@ -13,8 +13,16 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { useSetMetaTitle } from '~/composables/useSetMetaTitle';
 
 const modules = ref([Autoplay, Navigation, Pagination]);
+
+// seo
+const { title } = useSetMetaTitle();
+
+useSeoMeta({
+    title: title('房型列表'),
+});
 
 const importImage = url => {
     const image = new URL(url, import.meta.url);
@@ -28,12 +36,8 @@ const roomImages = computed(() => {
     const result = rooms.reduce((acc, roomId) => {
         acc[`room${roomId.toUpperCase()}`] = nums.reduce((obj, num) => {
             obj[num] = {
-                desktop: importImage(
-                    `../assets/images/room-${roomId}-${num}.png`
-                ),
-                mobile: importImage(
-                    `../assets/images/room-${roomId}-sm-${num}.png`
-                ),
+                desktop: importImage(`/images/room-${roomId}-${num}.png`),
+                mobile: importImage(`/images/room-${roomId}-sm-${num}.png`),
             };
             return obj;
         }, {});
@@ -60,12 +64,12 @@ const roomImages = computed(() => {
                 <swiper-slide v-for="(num, index) in 5" :key="index">
                     <picture>
                         <source
-                            srcset="@/assets/images/home-hero.png"
+                            srcset="/images/home-hero.png"
                             media="(min-width:576px)"
                         />
                         <img
                             class="hero-img"
-                            src="@/assets/images/home-hero-sm.png"
+                            src="/images/home-hero-sm.png"
                             alt="hero banner"
                         />
                     </picture>

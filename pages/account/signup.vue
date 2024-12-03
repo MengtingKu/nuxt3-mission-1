@@ -9,6 +9,13 @@
 import { Icon } from '@iconify/vue';
 
 const isEmailAndPasswordValid = ref(false);
+
+// seo
+const { title } = useSetMetaTitle();
+
+useSeoMeta({
+    title: title('註冊會員'),
+});
 </script>
 
 <template>
@@ -231,12 +238,12 @@ const isEmailAndPasswordValid = ref(false);
 
         <p class="mb-0 fs-8 fs-md-7">
             <span class="me-2 text-neutral-0 fw-medium">已經有會員了嗎？</span>
-            <RouterLink
+            <NuxtLink
                 to="/account/login"
                 class="text-primary-100 fw-bold text-decoration-underline bg-transparent border-0"
             >
                 <span>立即登入</span>
-            </RouterLink>
+            </NuxtLink>
         </p>
     </div>
 </template>

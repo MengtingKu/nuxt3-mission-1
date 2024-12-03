@@ -9,9 +9,16 @@
 // import { RouterLink } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
-import 'bootstrap/js/dist/modal';
+// import 'bootstrap/js/dist/modal';
 
 const roomId = 'a'; // for navigation demo
+
+// seo
+const { title } = useSetMetaTitle();
+
+useSeoMeta({
+    title: title('訂單列表'),
+});
 </script>
 
 <template>

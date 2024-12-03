@@ -5,6 +5,13 @@
  */
 
 // import { RouterLink } from 'vue-router';
+
+// seo
+const { title } = useSetMetaTitle();
+
+useSeoMeta({
+    title: title('會員登入'),
+});
 </script>
 
 <template>

@@ -3,6 +3,7 @@
  * 1. 動態預約確認頁面，path: 'booking/confirmation/:bookingId'：這裡的 :bookingId 是一個動態路由參數
  * 2. BookingConfirmView.vue -> [bookingId].vue
  */
+
 import { Icon } from '@iconify/vue';
 // import { useRoute } from 'vue-router';
 
@@ -42,6 +43,12 @@ const { bookingId } = route.params;
                         <button
                             class="btn btn-primary-100 px-md-15 py-4 text-neutral-0 fw-bold border-0 rounded-3"
                             type="button"
+                            @click="
+                                navigateTo({
+                                    name: 'user-userId-order',
+                                    params: { userId: 'me' },
+                                })
+                            "
                         >
                             前往我的訂單
                         </button>

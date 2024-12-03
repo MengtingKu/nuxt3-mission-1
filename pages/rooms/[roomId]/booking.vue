@@ -12,6 +12,13 @@ import { Icon } from '@iconify/vue';
 
 const router = useRouter();
 
+// seo
+const { title } = useSetMetaTitle();
+
+useSeoMeta({
+    title: title('預約房型'),
+});
+
 const goBack = () => {
     router.back();
 };
@@ -22,7 +29,7 @@ const confirmBooking = () => {
 
     setTimeout(() => {
         isLoading.value = false;
-        router.push({
+        navigateTo({
             name: 'booking-confirmation-bookingId',
             params: {
                 bookingId: 'HH2302183151222',

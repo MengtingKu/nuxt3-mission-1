@@ -2,6 +2,9 @@
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
+## Render
+畫面網址：https://nuxt3-mission-1.onrender.com/
+
 ## Setup
 
 Make sure to install dependencies:

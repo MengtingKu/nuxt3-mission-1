@@ -4,8 +4,6 @@
  * 2. BookingView.vue -> booking.vue (路由表 path: 'rooms/:roomId/booking')
  */
 
-// import { ref } from 'vue';
-// import { useRouter } from 'vue-router';
 import BookingLoading from '@/components/rooms/BookingLoading.vue';
 
 import { Icon } from '@iconify/vue';

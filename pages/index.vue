@@ -5,7 +5,6 @@
  * 3. 說明：Nuxt3 預設會將 default.vue 作為預設的模板，當頁面元件與 <NuxtLayout> 沒有特別指定模板，將會使用 default.vue 作為預設的 Layout
  */
 
-// import { ref } from 'vue';
 import { Icon } from '@iconify/vue';
 
 import { Swiper, SwiperSlide } from 'swiper/vue';
@@ -14,10 +13,6 @@ import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-
-// definePageMeta({
-//     layout: 'default',
-// });
 
 const modules = ref([Autoplay, Navigation, Pagination]);
 
@@ -35,30 +30,31 @@ const slideNext = () => {
 <template>
     <main class="overflow-hidden">
         <section class="hero position-relative">
-            <swiper
-                :modules="modules"
-                :slides-per-view="1"
-                :pagination="true"
-                :autoplay="{
-                    delay: 3000,
-                    disableOnInteraction: false,
-                }"
-            >
-                <swiper-slide v-for="(num, index) in 5" :key="index">
-                    <picture>
-                        <source
-                            srcset="@/assets/images/home-hero.png"
-                            media="(min-width:576px)"
-                        />
-                        <img
-                            class="hero-img"
-                            src="@/assets/images/home-hero-sm.png"
-                            alt="hero banner"
-                        />
-                    </picture>
-                </swiper-slide>
-            </swiper>
-
+            <ClientOnly>
+                <swiper
+                    :modules="modules"
+                    :slides-per-view="1"
+                    :pagination="true"
+                    :autoplay="{
+                        delay: 3000,
+                        disableOnInteraction: false,
+                    }"
+                >
+                    <swiper-slide v-for="(num, index) in 5" :key="index">
+                        <picture>
+                            <source
+                                srcset="@/assets/images/home-hero.png"
+                                media="(min-width:576px)"
+                            />
+                            <img
+                                class="hero-img"
+                                src="@/assets/images/home-hero-sm.png"
+                                alt="hero banner"
+                            />
+                        </picture>
+                    </swiper-slide>
+                </swiper>
+            </ClientOnly>
             <div
                 class="hero-wrapper d-flex flex-column justify-content-center align-items-center flex-md-row justify-content-md-between gap-md-10 w-100 px-md-20 position-absolute z-2"
             >
@@ -240,31 +236,33 @@ const slideNext = () => {
             <div
                 class="d-flex flex-column flex-md-row justify-content-center align-items-center justify-content-md-start align-items-md-end gap-6 gap-md-20"
             >
-                <swiper
-                    ref="roomSwiper"
-                    :modules="modules"
-                    :slides-per-view="1"
-                    :pagination="true"
-                    :autoplay="{
-                        delay: 5000,
-                        disableOnInteraction: false,
-                    }"
-                    :loop="true"
-                >
-                    <swiper-slide v-for="(num, index) in 5" :key="index">
-                        <picture>
-                            <source
-                                srcset="@/assets/images/home-room-1.png"
-                                media="(min-width:768px)"
-                            />
-                            <img
-                                class="w-100"
-                                src="@/assets/images/home-room-sm-1.png"
-                                alt="room-a"
-                            />
-                        </picture>
-                    </swiper-slide>
-                </swiper>
+                <ClientOnly>
+                    <swiper
+                        ref="roomSwiper"
+                        :modules="modules"
+                        :slides-per-view="1"
+                        :pagination="true"
+                        :autoplay="{
+                            delay: 5000,
+                            disableOnInteraction: false,
+                        }"
+                        :loop="true"
+                    >
+                        <swiper-slide v-for="(num, index) in 5" :key="index">
+                            <picture>
+                                <source
+                                    srcset="@/assets/images/home-room-1.png"
+                                    media="(min-width:768px)"
+                                />
+                                <img
+                                    class="w-100"
+                                    src="@/assets/images/home-room-sm-1.png"
+                                    alt="room-a"
+                                />
+                            </picture>
+                        </swiper-slide>
+                    </swiper>
+                </ClientOnly>
 
                 <div class="room-intro-content text-neutral-0">
                     <h2 class="mb-2 mb-md-4 fw-bold">尊爵雙人房</h2>
@@ -288,12 +286,7 @@ const slideNext = () => {
                             <Icon
                                 icon="mdi:arrow-left"
                                 class="bi m-4"
-                                style="
-                                    font-size: 1.5rem;
-                                    --bs-icon-link-transform: translateX(
-                                        -0.25em
-                                    );
-                                "
+                                style="font-size: 1.5rem;--bs-icon-link-transform: translateX(-0.25em);"
                             />
                         </button>
                         <button

@@ -6,10 +6,7 @@
  * 4. @/components/user/UserOrder.vue 的 path：user/:userId/order -> @\pages\user\[userId]\order.vue
  */
 
-// import { RouterLink } from 'vue-router';
 import { Icon } from '@iconify/vue';
-
-// import 'bootstrap/js/dist/modal';
 
 const roomId = 'a'; // for navigation demo
 

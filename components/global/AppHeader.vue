@@ -1,10 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-// import { RouterLink, useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
-
-// import 'bootstrap/js/dist/collapse';
-// import 'bootstrap/js/dist/dropdown';
 
 const { $bootstrap } = useNuxtApp();
 const navbar = ref(null);

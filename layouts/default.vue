@@ -5,7 +5,7 @@
  * 3. nuxt3 可以用資料夾當作路徑，把元件名稱新增路徑當前綴
  * 4. 說明：Nuxt3 預設會將 default.vue 作為預設的模板，當頁面元件與 <NuxtLayout> 沒有特別指定模板，將會使用 default.vue 作為預設的 Layout
  */
-// import { RouterView } from 'vue-router';
+
 import AppHeader from '@/components/global/AppHeader.vue';
 import AppFooter from '@/components/global/AppFooter.vue';
 </script>

@@ -3,8 +3,6 @@
  * 建立房型資料夾 rooms，裡面要放房型內容介紹頁 & 動態路由頁面
  */
 
-// import { computed, ref } from 'vue';
-// import { RouterLink } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
 import { Swiper, SwiperSlide } from 'swiper/vue';
@@ -52,29 +50,31 @@ const roomImages = computed(() => {
 <template>
     <main>
         <section class="hero position-relative">
-            <swiper
-                :modules="modules"
-                :slides-per-view="1"
-                :pagination="true"
-                :autoplay="{
-                    delay: 3000,
-                    disableOnInteraction: false,
-                }"
-            >
-                <swiper-slide v-for="(num, index) in 5" :key="index">
-                    <picture>
-                        <source
-                            srcset="/images/home-hero.png"
-                            media="(min-width:576px)"
-                        />
-                        <img
-                            class="hero-img"
-                            src="/images/home-hero-sm.png"
-                            alt="hero banner"
-                        />
-                    </picture>
-                </swiper-slide>
-            </swiper>
+            <ClientOnly>
+                <swiper
+                    :modules="modules"
+                    :slides-per-view="1"
+                    :pagination="true"
+                    :autoplay="{
+                        delay: 3000,
+                        disableOnInteraction: false,
+                    }"
+                >
+                    <swiper-slide v-for="(num, index) in 5" :key="index">
+                        <picture>
+                            <source
+                                srcset="/images/home-hero.png"
+                                media="(min-width:576px)"
+                            />
+                            <img
+                                class="hero-img"
+                                src="/images/home-hero-sm.png"
+                                alt="hero banner"
+                            />
+                        </picture>
+                    </swiper-slide>
+                </swiper>
+            </ClientOnly>
 
             <div
                 class="hero-wrapper d-flex flex-column justify-content-center align-items-center flex-md-row gap-10 gap-md-20 w-100 position-absolute z-2"
@@ -110,39 +110,42 @@ const roomImages = computed(() => {
                     >
                         <div class="row">
                             <div class="col-12 col-lg-7">
-                                <swiper
-                                    :modules="modules"
-                                    :slides-per-view="1"
-                                    navigation
-                                    :pagination="{ clickable: true }"
-                                    :autoplay="{
-                                        delay: 2500,
-                                        disableOnInteraction: false,
-                                    }"
-                                >
-                                    <swiper-slide
-                                        v-for="(num, index) in 5"
-                                        :key="index"
+                                <ClientOnly>
+                                    <swiper
+                                        :modules="modules"
+                                        :slides-per-view="1"
+                                        navigation
+                                        :pagination="{ clickable: true }"
+                                        :autoplay="{
+                                            delay: 2500,
+                                            disableOnInteraction: false,
+                                        }"
                                     >
-                                        <picture>
-                                            <source
-                                                :srcset="
-                                                    roomImages.roomA[num]
-                                                        .desktop
-                                                "
-                                                media="(min-width: 768px)"
-                                            />
-                                            <img
-                                                class="w-100 object-fit-cover"
-                                                :src="
-                                                    roomImages.roomA[num].mobile
-                                                "
-                                                loading="lazy"
-                                                :alt="`room-a-${num}`"
-                                            />
-                                        </picture>
-                                    </swiper-slide>
-                                </swiper>
+                                        <swiper-slide
+                                            v-for="(num, index) in 5"
+                                            :key="index"
+                                        >
+                                            <picture>
+                                                <source
+                                                    :srcset="
+                                                        roomImages.roomA[num]
+                                                            .desktop
+                                                    "
+                                                    media="(min-width: 768px)"
+                                                />
+                                                <img
+                                                    class="w-100 object-fit-cover"
+                                                    :src="
+                                                        roomImages.roomA[num]
+                                                            .mobile
+                                                    "
+                                                    loading="lazy"
+                                                    :alt="`room-a-${num}`"
+                                                />
+                                            </picture>
+                                        </swiper-slide>
+                                    </swiper>
+                                </ClientOnly>
                             </div>
                             <div class="col-12 col-lg-5">
                                 <div class="card-body pe-md-10 py-md-10">
@@ -226,39 +229,42 @@ const roomImages = computed(() => {
                     >
                         <div class="row">
                             <div class="col-12 col-lg-7">
-                                <swiper
-                                    :modules="modules"
-                                    :slides-per-view="1"
-                                    navigation
-                                    :pagination="{ clickable: true }"
-                                    :autoplay="{
-                                        delay: 2500,
-                                        disableOnInteraction: false,
-                                    }"
-                                >
-                                    <swiper-slide
-                                        v-for="(num, index) in 5"
-                                        :key="index"
+                                <ClientOnly>
+                                    <swiper
+                                        :modules="modules"
+                                        :slides-per-view="1"
+                                        navigation
+                                        :pagination="{ clickable: true }"
+                                        :autoplay="{
+                                            delay: 2500,
+                                            disableOnInteraction: false,
+                                        }"
                                     >
-                                        <picture>
-                                            <source
-                                                :srcset="
-                                                    roomImages.roomB[num]
-                                                        .desktop
-                                                "
-                                                media="(min-width: 768px)"
-                                            />
-                                            <img
-                                                class="w-100 object-fit-cover"
-                                                :src="
-                                                    roomImages.roomB[num].mobile
-                                                "
-                                                loading="lazy"
-                                                :alt="`room-b-${num}`"
-                                            />
-                                        </picture>
-                                    </swiper-slide>
-                                </swiper>
+                                        <swiper-slide
+                                            v-for="(num, index) in 5"
+                                            :key="index"
+                                        >
+                                            <picture>
+                                                <source
+                                                    :srcset="
+                                                        roomImages.roomB[num]
+                                                            .desktop
+                                                    "
+                                                    media="(min-width: 768px)"
+                                                />
+                                                <img
+                                                    class="w-100 object-fit-cover"
+                                                    :src="
+                                                        roomImages.roomB[num]
+                                                            .mobile
+                                                    "
+                                                    loading="lazy"
+                                                    :alt="`room-b-${num}`"
+                                                />
+                                            </picture>
+                                        </swiper-slide>
+                                    </swiper>
+                                </ClientOnly>
                             </div>
                             <div class="col-12 col-lg-5">
                                 <div class="card-body pe-md-10 py-md-10">
@@ -342,39 +348,42 @@ const roomImages = computed(() => {
                     >
                         <div class="row">
                             <div class="col-12 col-lg-7">
-                                <swiper
-                                    :modules="modules"
-                                    :slides-per-view="1"
-                                    navigation
-                                    :pagination="{ clickable: true }"
-                                    :autoplay="{
-                                        delay: 2500,
-                                        disableOnInteraction: false,
-                                    }"
-                                >
-                                    <swiper-slide
-                                        v-for="(num, index) in 5"
-                                        :key="index"
+                                <ClientOnly>
+                                    <swiper
+                                        :modules="modules"
+                                        :slides-per-view="1"
+                                        navigation
+                                        :pagination="{ clickable: true }"
+                                        :autoplay="{
+                                            delay: 2500,
+                                            disableOnInteraction: false,
+                                        }"
                                     >
-                                        <picture>
-                                            <source
-                                                :srcset="
-                                                    roomImages.roomC[num]
-                                                        .desktop
-                                                "
-                                                media="(min-width: 768px)"
-                                            />
-                                            <img
-                                                class="w-100 object-fit-cover"
-                                                :src="
-                                                    roomImages.roomC[num].mobile
-                                                "
-                                                loading="lazy"
-                                                :alt="`room-c-${num}`"
-                                            />
-                                        </picture>
-                                    </swiper-slide>
-                                </swiper>
+                                        <swiper-slide
+                                            v-for="(num, index) in 5"
+                                            :key="index"
+                                        >
+                                            <picture>
+                                                <source
+                                                    :srcset="
+                                                        roomImages.roomC[num]
+                                                            .desktop
+                                                    "
+                                                    media="(min-width: 768px)"
+                                                />
+                                                <img
+                                                    class="w-100 object-fit-cover"
+                                                    :src="
+                                                        roomImages.roomC[num]
+                                                            .mobile
+                                                    "
+                                                    loading="lazy"
+                                                    :alt="`room-c-${num}`"
+                                                />
+                                            </picture>
+                                        </swiper-slide>
+                                    </swiper>
+                                </ClientOnly>
                             </div>
                             <div class="col-12 col-lg-5">
                                 <div class="card-body pe-md-10 py-md-10">
@@ -458,39 +467,42 @@ const roomImages = computed(() => {
                     >
                         <div class="row">
                             <div class="col-12 col-lg-7">
-                                <swiper
-                                    :modules="modules"
-                                    :slides-per-view="1"
-                                    navigation
-                                    :pagination="{ clickable: true }"
-                                    :autoplay="{
-                                        delay: 2500,
-                                        disableOnInteraction: false,
-                                    }"
-                                >
-                                    <swiper-slide
-                                        v-for="(num, index) in 5"
-                                        :key="index"
+                                <ClientOnly>
+                                    <swiper
+                                        :modules="modules"
+                                        :slides-per-view="1"
+                                        navigation
+                                        :pagination="{ clickable: true }"
+                                        :autoplay="{
+                                            delay: 2500,
+                                            disableOnInteraction: false,
+                                        }"
                                     >
-                                        <picture>
-                                            <source
-                                                :srcset="
-                                                    roomImages.roomD[num]
-                                                        .desktop
-                                                "
-                                                media="(min-width: 768px)"
-                                            />
-                                            <img
-                                                class="w-100 object-fit-cover"
-                                                :src="
-                                                    roomImages.roomD[num].mobile
-                                                "
-                                                loading="lazy"
-                                                :alt="`room-d-${num}`"
-                                            />
-                                        </picture>
-                                    </swiper-slide>
-                                </swiper>
+                                        <swiper-slide
+                                            v-for="(num, index) in 5"
+                                            :key="index"
+                                        >
+                                            <picture>
+                                                <source
+                                                    :srcset="
+                                                        roomImages.roomD[num]
+                                                            .desktop
+                                                    "
+                                                    media="(min-width: 768px)"
+                                                />
+                                                <img
+                                                    class="w-100 object-fit-cover"
+                                                    :src="
+                                                        roomImages.roomD[num]
+                                                            .mobile
+                                                    "
+                                                    loading="lazy"
+                                                    :alt="`room-d-${num}`"
+                                                />
+                                            </picture>
+                                        </swiper-slide>
+                                    </swiper>
+                                </ClientOnly>
                             </div>
                             <div class="col-12 col-lg-5">
                                 <div class="card-body pe-md-10 py-md-10">

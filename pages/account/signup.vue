@@ -4,8 +4,6 @@
  * 2. 變更檔名：@/components/account/AccountSignup.vue -> signup.vue
  */
 
-// import { ref } from 'vue';
-// import { RouterLink } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
 const isEmailAndPasswordValid = ref(false);

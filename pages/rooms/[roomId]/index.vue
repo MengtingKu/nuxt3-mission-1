@@ -4,8 +4,6 @@
  * 2. 路由表裡有預約房型，這是從動態房型詳細頁面開出去，所以需要把原來檔案變更成動態路由中設置嵌套路由 pages/rooms/[roomId]/index.vue
  */
 
-// import { ref, reactive } from 'vue';
-// import { RouterLink } from 'vue-router';
 import DatePickerModal from '@/components/rooms/DatePickerModal.vue';
 import { Icon } from '@iconify/vue';
 
@@ -649,7 +647,7 @@ const handleDateChange = bookingInfo => {
                     </div>
                     <NuxtLink
                         :to="{
-                            name: 'booking',
+                            name: 'rooms-roomId-booking',
                             params: { roomId: $route.params.roomId },
                         }"
                         class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3"

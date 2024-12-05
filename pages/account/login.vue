@@ -4,8 +4,6 @@
  * 2. 變更檔名：@/components/account/AccountLogin.vue -> login.vue
  */
 
-// import { RouterLink } from 'vue-router';
-
 // seo
 const { title } = useSetMetaTitle();
 

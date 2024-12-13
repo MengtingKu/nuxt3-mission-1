@@ -8,6 +8,55 @@ import { Icon } from '@iconify/vue';
 
 const isEmailAndPasswordValid = ref(false);
 
+// api
+const isEnabled = ref(false);
+const { setSwal } = useSetSwal();
+const registrationFormData = ref({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    birthday: {
+        year: null,
+        month: null,
+        day: null,
+    },
+    address: {
+        zipcode: null,
+        detail: '',
+    },
+});
+
+const postSingUp = async request => {
+    try {
+        isEnabled.value = true;
+        const { year, month, day } = registrationFormData.birthday;
+
+        await $fetch('/api/v1/user/signup', {
+            method: 'POST',
+            baseURL: 'https://nuxr3.zeabur.app',
+            body: {
+                ...request,
+                birthday: `${year}/${month}/${day}`,
+            },
+        });
+        await setSwal('success', '註冊成功');
+
+        navigateTo('/account/login');
+    } catch (error) {
+        const { message } = error.response._data;
+
+        await setSwal('error', message);
+
+        message === '此 Email 已註冊'
+            ? navigateTo('/account/login')
+            : navigateTo('/account/signup');
+    } finally {
+        registrationFormData.value = {}; // 清空註冊表單
+        isEnabled.value = false; // 解鎖按鈕
+    }
+};
+
 // seo
 const { title } = useSetMetaTitle();
 
@@ -77,6 +126,7 @@ useSeoMeta({
                         class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
                         placeholder="hello@exsample.com"
                         type="email"
+                        v-model="registrationFormData.email"
                     />
                 </div>
                 <div class="mb-4 fs-8 fs-md-7">
@@ -86,8 +136,9 @@ useSeoMeta({
                     <input
                         id="password"
                         class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-                        placeholder="請輸入密碼"
+                        placeholder="請輸入 8 碼以上密碼"
                         type="password"
+                        v-model="registrationFormData.password"
                     />
                 </div>
                 <div class="mb-10 fs-8 fs-md-7">
@@ -112,7 +163,11 @@ useSeoMeta({
                     下一步
                 </button>
             </form>
-            <form :class="{ 'd-none': !isEmailAndPasswordValid }" class="mb-4">
+            <form
+                :class="{ 'd-none': !isEmailAndPasswordValid }"
+                class="mb-4"
+                @submit.prevent="postSingUp(registrationFormData)"
+            >
                 <div class="mb-4 fs-8 fs-md-7">
                     <label class="mb-2 text-neutral-0 fw-bold" for="name">
                         姓名
@@ -122,6 +177,7 @@ useSeoMeta({
                         class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 rounded-3"
                         placeholder="請輸入姓名"
                         type="text"
+                        v-model="registrationFormData.name"
                     />
                 </div>
                 <div class="mb-4 fs-8 fs-md-7">
@@ -133,6 +189,7 @@ useSeoMeta({
                         class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 rounded-3"
                         placeholder="請輸入手機號碼"
                         type="tel"
+                        v-model="registrationFormData.phone"
                     />
                 </div>
                 <div class="mb-4 fs-8 fs-md-7">
@@ -143,33 +200,36 @@ useSeoMeta({
                         <select
                             id="birth"
                             class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                            v-model="registrationFormData.birthday.year"
                         >
                             <option
                                 v-for="year in 65"
                                 :key="year"
-                                value="`${year + 1958} 年`"
+                                :value="`${year + 1958}`"
                             >
                                 {{ year + 1958 }} 年
                             </option>
                         </select>
                         <select
                             class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                            v-model="registrationFormData.birthday.month"
                         >
                             <option
                                 v-for="month in 12"
                                 :key="month"
-                                value="`${month} 月`"
+                                :value="`${month}`"
                             >
                                 {{ month }} 月
                             </option>
                         </select>
                         <select
                             class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                            v-model="registrationFormData.birthday.day"
                         >
                             <option
                                 v-for="day in 30"
                                 :key="day"
-                                value="`${day} 日`"
+                                :value="`${day}`"
                             >
                                 {{ day }} 日
                             </option>
@@ -185,6 +245,16 @@ useSeoMeta({
                     </label>
                     <div>
                         <div class="d-flex gap-2 mb-2">
+                            <input
+                                v-model="registrationFormData.address.zipcode"
+                                type="text"
+                                class="form-control p-4 text-neutral-180 fw-medium rounded-3"
+                                id="zipCode"
+                                placeholder="郵遞區號"
+                                pattern="\d{3,}"
+                                required
+                            />
+                            <label for="zipCode">郵遞區號</label>
                             <select
                                 class="form-select p-4 text-neutral-80 fw-medium rounded-3"
                             >
@@ -205,6 +275,7 @@ useSeoMeta({
                             type="text"
                             class="form-control p-4 rounded-3"
                             placeholder="請輸入詳細地址"
+                            v-model="registrationFormData.address.detail"
                         />
                     </div>
                 </div>
@@ -227,7 +298,7 @@ useSeoMeta({
                 </div>
                 <button
                     class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold"
-                    type="button"
+                    type="submit"
                 >
                     完成註冊
                 </button>

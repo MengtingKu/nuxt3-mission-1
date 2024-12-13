@@ -27,6 +27,15 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
+
+const logout = () => {
+    // 清除 auth cookie
+    const tokenCookie = useCookie('auth');
+    tokenCookie.value = ''; // 或者使用 tokenCookie.remove() 方法
+
+    // 導向登入頁面
+    navigateTo('/account/login');
+};
 </script>
 
 <template>
@@ -81,7 +90,7 @@ onUnmounted(() => {
                                         class="fs-5"
                                         icon="mdi:account-circle-outline"
                                     />
-                                    Jessica
+                                    Jessica123123
                                 </button>
                                 <ul
                                     class="dropdown-menu py-3 overflow-hidden"
@@ -105,6 +114,7 @@ onUnmounted(() => {
                                         <NuxtLink
                                             to="/"
                                             class="dropdown-item px-6 py-4"
+                                            @click="logout"
                                             >登出
                                         </NuxtLink>
                                     </li>

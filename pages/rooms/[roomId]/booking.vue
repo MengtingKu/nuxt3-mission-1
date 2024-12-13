@@ -10,6 +10,9 @@ import { Icon } from '@iconify/vue';
 
 const router = useRouter();
 
+// api
+const ordersUrl = 'https://nuxr3.zeabur.app/api/v1/orders/';
+
 // seo
 const { title } = useSetMetaTitle();
 

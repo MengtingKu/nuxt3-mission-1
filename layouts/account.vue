@@ -45,7 +45,7 @@ import { Icon } from '@iconify/vue';
                                         class="fs-5"
                                         icon="mdi:account-circle-outline"
                                     />
-                                    Jessica
+                                    Jessica123
                                 </NuxtLink>
                             </li>
                             <li class="d-md-none nav-item">

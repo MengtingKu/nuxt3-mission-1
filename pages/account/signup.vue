@@ -1,9 +1,4 @@
 <script setup>
-/**
- * 1. path: '/account/signup' -> pages\account\signup.vue
- * 2. 變更檔名：@/components/account/AccountSignup.vue -> signup.vue
- */
-
 import { Icon } from '@iconify/vue';
 
 const isEmailAndPasswordValid = ref(false);

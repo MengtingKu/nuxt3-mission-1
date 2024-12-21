@@ -1,13 +1,68 @@
 <script setup>
-/**
- * 1. user/:userId 是一個動態路由，裡面有兩個嵌套的子路由：profile 和 order
- * 2. 狀態跟房型詳細是一樣的概念，動態路由中的嵌套路由，所以需要建立一個嵌套路由文件夾 [userId]
- * 3. 路由表中嵌套的子路由 profile 和 order 放在資料夾內
- * 4. @/components/user/UserProfile.vue 的 path：user/:userId/profile -> @\pages\user\[userId]\profile.vue
- */
-
 const isEditPassword = ref(false);
 const isEditProfile = ref(false);
+const { findAreaByZipCode } = useConversionZip();
+
+// store
+const bookingStore = useBookingStore();
+const { userDetailInfo } = storeToRefs(bookingStore);
+
+const accountToken = useCookie('accountToken');
+const { formateDateNoWeek } = useHandleDate();
+
+const resetInfo = ref({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+    name: '',
+    email: '',
+    phone: '',
+    birthday: {
+        year: null,
+        month: null,
+        day: null,
+    },
+    address: {
+        zipcode: null,
+        detail: '',
+    },
+});
+
+onMounted(() => {
+    if (accountToken.value || !userDetailInfo.value) {
+        bookingStore.getUserInfo();
+    }
+});
+
+// 忘記密碼 & 更新使用者資訊
+const showError = ref(false);
+
+const resetData = computed(() => {
+    return { ...resetInfo.value, ...userDetailInfo.value };
+});
+
+const checkPasswords = () => {
+    if (resetInfo.value.newPassword && resetInfo.value.confirmPassword) {
+        showError.value =
+            resetInfo.value.newPassword !== resetInfo.value.confirmPassword;
+    }
+};
+
+const reset = async (from = 'password') => {
+    if (accountToken.value || !userDetailInfo.value) {
+        await bookingStore.getUserInfo();
+    }
+
+    delete resetData.value.confirmPassword;
+    delete resetData.value.updatedAt;
+    delete resetData.value.createdAt;
+    if (from === 'baseInfo') {
+        delete resetData.value.oldPassword;
+        delete resetData.value.newPassword;
+    }
+    await bookingStore.forgetPassword(resetData.value);
+    isEditProfile.value = false;
+};
 
 // seo
 const { title } = useSetMetaTitle();
@@ -29,7 +84,7 @@ useSeoMeta({
                         <p class="mb-2 text-neutral-80 fw-medium">電子信箱</p>
                         <span
                             class="form-control pe-none p-0 text-neutral-100 fw-bold border-0"
-                            >Jessica@exsample.com</span
+                            >{{ userDetailInfo.email ?? '-' }}</span
                         >
                     </div>
 
@@ -46,7 +101,7 @@ useSeoMeta({
                             <input
                                 class="form-control pe-none p-0 text-neutral-100 fs-5 fs-md-3 fw-bold border-0"
                                 type="password"
-                                value="**********"
+                                :value="userDetailInfo.email"
                             />
                         </div>
 
@@ -74,6 +129,7 @@ useSeoMeta({
                                 type="password"
                                 class="form-control p-4 fs-7 rounded-3"
                                 placeholder="請輸入舊密碼"
+                                v-model="resetInfo.oldPassword"
                             />
                         </div>
 
@@ -88,6 +144,8 @@ useSeoMeta({
                                 type="password"
                                 class="form-control p-4 fs-7 rounded-3"
                                 placeholder="請輸入新密碼"
+                                v-model="resetInfo.newPassword"
+                                @blur="checkPasswords()"
                             />
                         </div>
 
@@ -102,17 +160,32 @@ useSeoMeta({
                                 type="password"
                                 class="form-control p-4 fs-7 rounded-3"
                                 placeholder="請再輸入一次新密碼"
+                                v-model="resetInfo.confirmPassword"
+                                @blur="checkPasswords()"
                             />
+                            <small v-if="showError" class="text-danger mt-2">
+                                密碼不一致，請再確認一次。
+                            </small>
                         </div>
                     </div>
-
-                    <button
-                        :class="{ 'd-none': !isEditPassword }"
-                        class="btn btn-neutral-40 align-self-md-start px-8 py-4 text-neutral-60 rounded-3"
-                        type="button"
-                    >
-                        儲存設定
-                    </button>
+                        <button
+                            :class="{ 'd-none': !isEditPassword }"
+                            class="btn btn-outline-neutral-100 align-self-md-start px-8 py-3 text-neutral-60 rounded-3 w-75 ms-auto"
+                            type="button"
+                            :disabled="!showError && !resetInfo.oldPassword"
+                            @click="reset()"
+                        >
+                            儲存設定
+                        </button>
+                        
+                        <button
+                            :class="{ 'd-none': !isEditPassword }"
+                            class="btn btn-neutral-100 align-self-md-start px-8 py-3 text-neutral-0 rounded-3 w-75 ms-auto"
+                            type="button"
+                            @click="isEditPassword = !isEditPassword"
+                        >
+                            取消
+                        </button>
                 </div>
             </section>
         </div>
@@ -143,7 +216,7 @@ useSeoMeta({
                                 'p-4': isEditProfile,
                             }"
                             type="text"
-                            value="Jessica Wang"
+                            :value="userDetailInfo.name"
                         />
                     </div>
 
@@ -167,7 +240,7 @@ useSeoMeta({
                                 'p-4': isEditProfile,
                             }"
                             type="tel"
-                            value="+886 912 345 678"
+                            :value="userDetailInfo.phone"
                         />
                     </div>
 
@@ -185,8 +258,11 @@ useSeoMeta({
                         <span
                             class="form-control pe-none p-0 text-neutral-100 fw-bold border-0"
                             :class="{ 'd-none': isEditProfile }"
-                            >1990 年 8 月 15 日</span
                         >
+                            {{
+                                `${formateDateNoWeek(userDetailInfo.birthday)}`
+                            }}
+                        </span>
                         <div
                             class="d-flex gap-2"
                             :class="{ 'd-none': !isEditProfile }"
@@ -194,33 +270,36 @@ useSeoMeta({
                             <select
                                 id="birth"
                                 class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                                v-model="resetInfo.birthday.year"
                             >
                                 <option
                                     v-for="year in 65"
                                     :key="year"
-                                    value="`${year + 1958} 年`"
+                                    :value="`${year + 1958}`"
                                 >
                                     {{ year + 1958 }} 年
                                 </option>
                             </select>
                             <select
                                 class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                                v-model="resetInfo.birthday.month"
                             >
                                 <option
                                     v-for="month in 12"
                                     :key="month"
-                                    value="`${month} 月`"
+                                    :value="`${month} 月`"
                                 >
                                     {{ month }} 月
                                 </option>
                             </select>
                             <select
                                 class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                                v-model="resetInfo.birthday.day"
                             >
                                 <option
                                     v-for="day in 30"
                                     :key="day"
-                                    value="`${day} 日`"
+                                    :value="`${day} 日`"
                                 >
                                     {{ day }} 日
                                 </option>
@@ -242,7 +321,11 @@ useSeoMeta({
                         <span
                             class="form-control pe-none p-0 text-neutral-100 fw-bold border-0"
                             :class="{ 'd-none': isEditProfile }"
-                            >高雄市新興區六角路 123 號</span
+                            >{{
+                                `${findAreaByZipCode(
+                                    userDetailInfo.address?.zipcode
+                                )}${userDetailInfo.address?.detail}`
+                            }}</span
                         >
                         <div :class="{ 'd-none': !isEditProfile }">
                             <div class="d-flex gap-2 mb-2">
@@ -270,6 +353,7 @@ useSeoMeta({
                                 type="text"
                                 class="form-control p-4 rounded-3"
                                 placeholder="請輸入詳細地址"
+                                v-model="resetInfo.address.detail"
                             />
                         </div>
                     </div>
@@ -282,14 +366,29 @@ useSeoMeta({
                 >
                     編輯
                 </button>
-
-                <button
-                    :class="{ 'd-none': !isEditProfile }"
-                    class="btn btn-neutral-40 align-self-md-start px-8 py-4 text-neutral-60 rounded-3"
-                    type="button"
-                >
-                    儲存設定
-                </button>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button
+                        :class="{ 'd-none': !isEditProfile }"
+                        class="btn btn-outline-neutral-100 align-self-md-start px-8 py-4 text-neutral-60 rounded-3"
+                        type="button"
+                        :disabled="
+                            resetInfo.birthday.year === null ||
+                            resetInfo.birthday.month === null ||
+                            resetInfo.birthday.day === null
+                        "
+                        @click="reset('baseInfo')"
+                    >
+                        儲存設定
+                    </button>
+                    <button
+                        :class="{ 'd-none': !isEditProfile }"
+                        class="btn btn-neutral-100 align-self-md-start px-8 py-4 text-neutral-00 rounded-3"
+                        type="button"
+                        @click="isEditProfile = !isEditProfile"
+                    >
+                        取消編輯
+                    </button>
+                </div>
             </section>
         </div>
     </div>

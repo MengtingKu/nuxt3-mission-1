@@ -12,31 +12,13 @@ const datePickerModal = ref(null);
 // api
 const route = useRoute();
 const { roomId } = route.params;
-const roomUrl = `https://nuxr3.zeabur.app/api/v1/rooms/${roomId}`;
 
-const groupedImages = imageUrlList => {
-    return imageUrlList.reduce((groups, currentImage, index) => {
-        if (index % 2 === 0) {
-            groups.push([currentImage]);
-        } else {
-            groups[groups.length - 1].push(currentImage);
-        }
+// 將房型資料 data 改成使用 Pinia 管理
+const bookingStore = useBookingStore();
+const { getRoomDetail, setBookingInfo } = bookingStore;
+const { roomDetail } = storeToRefs(bookingStore);
 
-        return groups;
-    }, []);
-};
-
-const { data: roomDetail } = await useFetch(roomUrl, {
-    transform: response => {
-        const { result } = response;
-
-        if (result.imageUrlList) {
-            result.groupedImages = groupedImages(result.imageUrlList);
-        }
-
-        return result;
-    },
-});
+getRoomDetail(roomId);
 
 // seo
 const { title } = useSetMetaTitle();
@@ -45,20 +27,20 @@ useSeoMeta({
     title: title('房型詳細'),
 });
 
+// 日期選擇器
+const bookingPeople = ref(1);
+const daysCount = ref(0);
+
 const openModal = () => {
     datePickerModal.value.openModal();
 };
-
-const MAX_BOOKING_PEOPLE = 10;
-const bookingPeople = ref(1);
-
-const daysCount = ref(0);
 
 const daysFormatOnMobile = date => date?.split('-').slice(1, 3).join(' / ');
 
 const formatDate = date => {
     const offsetToUTC8 = date.getHours() + 8;
     date.setHours(offsetToUTC8);
+
     return date.toISOString().split('T')[0];
 };
 
@@ -80,6 +62,23 @@ const handleDateChange = bookingInfo => {
 
     bookingPeople.value = bookingInfo?.people || 1;
     daysCount.value = bookingInfo.daysCount;
+};
+
+// 訂房
+const { $dayjs } = useNuxtApp();
+
+const dateDiff = (start, end) => $dayjs(end).diff($dayjs(start), 'day');
+const acceptBooking = () => {
+    setBookingInfo({
+        roomId,
+        checkInDate: bookingDate.date.start,
+        checkOutDate: bookingDate.date.end,
+        bookingDays: dateDiff(bookingDate.date.start, bookingDate.date.end),
+        peopleNum: bookingPeople.value,
+        userInfo: {},
+    });
+
+    navigateTo(`/rooms/${roomId}/booking`);
 };
 </script>
 
@@ -387,7 +386,7 @@ const handleDateChange = bookingInfo => {
                                 </div>
 
                                 <div
-                                    class="d-flex justify-content-between align-items-center text-neutral-100"
+                                    class="d-flex justify-content-between align-items-center text-neutral-100 mb-3"
                                 >
                                     <p class="mb-0">人數</p>
                                     <div
@@ -421,7 +420,7 @@ const handleDateChange = bookingInfo => {
                                             :class="{
                                                 'disabled bg-neutral-40':
                                                     bookingPeople ===
-                                                    MAX_BOOKING_PEOPLE,
+                                                    roomDetail.maxPeople,
                                             }"
                                             class="btn btn-neutral-0 p-4 border border-neutral-40 rounded-circle"
                                             type="button"
@@ -434,20 +433,42 @@ const handleDateChange = bookingInfo => {
                                         </button>
                                     </div>
                                 </div>
+                                <small
+                                    class="d-block text-danger text-end"
+                                    :class="`${
+                                        bookingPeople === roomDetail.maxPeople
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
+                                    }`"
+                                >
+                                    {{ roomDetail.name }}最多入住
+                                    {{ roomDetail.maxPeople }} 人
+                                </small>
                             </div>
 
                             <h5 class="mb-0 text-primary-100 fw-bold">
-                                NT$ {{ `${roomDetail.price.toLocaleString()}` }}
+                                NT$
+                                {{ `${roomDetail?.price?.toLocaleString()}` }}
                             </h5>
-                            <NuxtLink
-                                :to="{
-                                    name: 'rooms-roomId-booking',
-                                    params: { roomId: $route.params.roomId },
-                                }"
+                            <button
+                                type="button"
                                 class="btn btn-primary-100 py-4 text-neutral-0 fw-bold rounded-3"
+                                :disabled="bookingDate.date.end === null"
+                                @click="acceptBooking"
                             >
                                 立即預訂
-                            </NuxtLink>
+                            </button>
+                            <small
+                                class="text-danger text-end"
+                                :class="`${
+                                    bookingDate.date.end === null
+                                        ? 'opacity-100'
+                                        : 'opacity-0'
+                                }`"
+                                style="margin-top: -20px"
+                            >
+                                請選擇退房日期
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -458,7 +479,7 @@ const handleDateChange = bookingInfo => {
             >
                 <template v-if="bookingDate.date.end === null">
                     <small class="text-neutral-80 fw-medium"
-                        >NT$ {{ `${roomDetail.price.toLocaleString()}` }} /
+                        >NT$ {{ `${roomDetail?.price?.toLocaleString()}` }} /
                         晚</small
                     >
                     <button
@@ -472,8 +493,8 @@ const handleDateChange = bookingInfo => {
 
                 <template v-else>
                     <div class="d-flex flex-column gap-1">
-                        <small class="text-neutral-80 fw-medium"
-                            >NT$ {{ `${roomDetail.price.toLocaleString()}` }} /
+                        <small class="text-neutral-80 fw-medium">
+                            NT$ {{ `${roomDetail?.price?.toLocaleString()}` }} /
                             {{ daysCount }} 晚 / {{ bookingPeople }} 人</small
                         >
                         <span
@@ -485,10 +506,7 @@ const handleDateChange = bookingInfo => {
                         >
                     </div>
                     <NuxtLink
-                        :to="{
-                            name: 'rooms-roomId-booking',
-                            params: { roomId: $route.params.roomId },
-                        }"
+                        :to="`/rooms/${roomId}/booking`"
                         class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3"
                     >
                         立即預訂

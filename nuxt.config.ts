@@ -64,4 +64,6 @@ export default defineNuxtConfig({
         global: true,
         dirs: ['~/components/global'],
     },
+    modules: ['@pinia/nuxt'],
+    plugins: ['~/plugins/dayjs.js'],
 });

@@ -4,48 +4,19 @@
  * 2. 變更檔名：@/components/account/AccountLogin.vue -> login.vue
  */
 
-// api
-const { setSwal } = useSetSwal();
-const isEnabled = ref(false);
+// store
+const bookingStore = useBookingStore();
+const { postLogin } = bookingStore;
+
+const route = useRoute();
+
+const isFetch = ref(false);
 const user = ref({
     email: '',
     password: '',
 });
 
-const postLogin = request => {
-    isEnabled.value = true;
-
-    $fetch('/api/v1/user/login', {
-        method: 'POST',
-        baseURL: 'https://nuxr3.zeabur.app',
-        body: { ...request },
-    })
-        .then(({ token, result }) => {
-            // 設定 cookie，儲存 token 及其過期時間
-            const cookie = useCookie('auth', {
-                path: '/',
-            });
-            cookie.value = token;
-            setSwal('success', '登入成功');
-
-            navigateTo(`/user/${result.id}/order`);
-        })
-        .catch(error => {
-            console.dir(error);
-            const { message } = error.response._data;
-            // message 有 陣列 [] 和字串 "" 兩種回應格式
-            if (Array.isArray(message)) {
-                alert(message.join('、'));
-                setSwal('error', message.join('、'));
-                return;
-            }
-            setSwal('error', message);
-        })
-        .finally(() => {
-            user.value = {};
-            isEnabled.value = false;
-        });
-};
+const login = () => postLogin(user.value, route.query.from);
 
 // seo
 const { title } = useSetMetaTitle();
@@ -64,7 +35,7 @@ useSeoMeta({
             <h1 class="text-neutral-0 fw-bold">立即開始旅程</h1>
         </div>
 
-        <form class="mb-10" @submit.prevent="postLogin(user)">
+        <form class="mb-10" @submit.prevent="login()">
             <div class="mb-4 fs-8 fs-md-7">
                 <label class="mb-2 text-neutral-0 fw-bold" for="email">
                     電子信箱
@@ -116,7 +87,7 @@ useSeoMeta({
             <button
                 class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold"
                 type="submit"
-                :disabled="isEnabled"
+                :disabled="isFetch"
             >
                 會員登入
             </button>

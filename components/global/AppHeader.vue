@@ -3,9 +3,18 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { Icon } from '@iconify/vue';
 
 const { $bootstrap } = useNuxtApp();
+const { setSwal } = useSetSwal();
+
+// store
+const bookingStore = useBookingStore();
+const { userDetailInfo } = storeToRefs(bookingStore);
+const accountToken = useCookie('accountToken');
+const user = useCookie('user');
+
 const navbar = ref(null);
 const dropdown = ref(null);
 const isScrolled = ref(false);
+const userInfo = ref(null);
 
 const route = useRoute();
 const transparentBgRoute = ['home', 'rooms'];
@@ -19,6 +28,10 @@ const handleScroll = () => {
 };
 
 onMounted(() => {
+    if (accountToken.value || !userDetailInfo.value) {
+        bookingStore.getUserInfo();
+    }
+
     window.addEventListener('scroll', handleScroll);
     $bootstrap.collapse(navbar.value);
     $bootstrap.dropdown(dropdown.value);
@@ -28,13 +41,29 @@ onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
 
-const logout = () => {
-    // 清除 auth cookie
-    const tokenCookie = useCookie('auth');
-    tokenCookie.value = ''; // 或者使用 tokenCookie.remove() 方法
+watchEffect(() => {
+    if (accountToken.value && userDetailInfo.value) {
+        userInfo.value = userDetailInfo.value;
+    }
+});
 
-    // 導向登入頁面
-    navigateTo('/account/login');
+// 會員專區
+const linkTo = () => {
+    if (!accountToken.value) {
+        setSwal('info', '請先登入帳號');
+        navigateTo(`/account/login?from=${route.name}`);
+    } else {
+        navigateTo(`/user/${userInfo.value._id}/profile`);
+    }
+};
+
+// 登出
+const logout = () => {
+    accountToken.value = '';
+    user.value = '';
+
+    setSwal('success', '您已經登出');
+    navigateTo('/');
 };
 </script>
 
@@ -90,7 +119,7 @@ const logout = () => {
                                         class="fs-5"
                                         icon="mdi:account-circle-outline"
                                     />
-                                    Jessica123123
+                                    {{ `${user || '會員專區'}` }}
                                 </button>
                                 <ul
                                     class="dropdown-menu py-3 overflow-hidden"
@@ -102,11 +131,8 @@ const logout = () => {
                                 >
                                     <li>
                                         <NuxtLink
-                                            :to="{
-                                                name: 'user-userId-profile',
-                                                params: { userId: 'me' },
-                                            }"
                                             class="dropdown-item px-6 py-4"
+                                            @click="linkTo"
                                             >我的帳戶
                                         </NuxtLink>
                                     </li>
@@ -131,8 +157,8 @@ const logout = () => {
                         </li>
                         <li class="nav-item">
                             <NuxtLink
-                                :to="{ name: 'rooms' }"
                                 class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3"
+                                @click="navigateTo('/rooms')"
                             >
                                 立即訂房
                             </NuxtLink>

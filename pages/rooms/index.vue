@@ -23,7 +23,7 @@ const { data: roomList } = await useFetch(roomsUrl, {
         const { result } = response;
 
         return result;
-    }
+    },
 });
 
 // seo
@@ -32,11 +32,6 @@ const { title } = useSetMetaTitle();
 useSeoMeta({
     title: title('房型列表'),
 });
-
-const importImage = url => {
-    const image = new URL(url, import.meta.url);
-    return image.href;
-};
 </script>
 
 <template>
@@ -175,8 +170,8 @@ const importImage = url => {
                                                 class="mb-2 fs-5 text-primary-100"
                                                 icon="ic:baseline-person"
                                             />
-                                            <p class="mb-0 fw-bold text-neutral-80 text-nowrap">
-                                                2-4 人
+                                            <p class="mb-0 fw-bold text-neutral-80 text-nowrap" >
+                                                2-{{ room.maxPeople }} 人
                                             </p>
                                         </li>
                                     </ul>

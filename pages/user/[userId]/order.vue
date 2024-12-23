@@ -19,19 +19,24 @@ const bookingStore = useBookingStore();
 const { ordersList } = storeToRefs(bookingStore);
 
 const isHistoryOrders = ref(true);
-const userOrders = ref([...ordersList.value]);
+const userOrders = ref(ordersList.value);
 
 onMounted(async () => {
     if (accountToken.value || !ordersList.value) {
         await bookingStore.getOrders();
     }
     userOrders.value = ordersList.value;
+    console.log('userOrders.value=>', userOrders.value);
 });
 
 const historyOrders = computed(() => {
+    if (!Object.keys(userOrders.value).length || !userOrders.value) return [];
+
     return filterHistoryOrders(userOrders.value);
 });
 const closestOrder = computed(() => {
+    if (!Object.keys(userOrders.value).length || !userOrders.value) return null;
+
     return findClosestOrder(userOrders.value);
 });
 
@@ -53,10 +58,11 @@ const viewMoreOrders = () => {
 
 // 取消訂單
 const cancelOrder = async orderId => {
+    console.log('orderId=>', orderId);
     await bookingStore.deleteOrder(orderId);
 
     userOrders.value = userOrders.value.filter(order => order._id !== orderId);
-    if (!userOrders.value) {
+    if (!userOrders.value.length) {
         setSwal('info', '您已經無訂單');
         navigateTo('/rooms');
     }
@@ -67,6 +73,7 @@ const cancelOrder = async orderId => {
     <div class="row gap-6 gap-md-0">
         <div class="col-12 col-md-7">
             <div
+                v-if="closestOrder"
                 class="rounded-3xl d-flex flex-column gap-6 gap-md-10 p-4 p-md-10 bg-neutral-0"
                 style="max-width: 730px"
             >
@@ -206,6 +213,7 @@ const cancelOrder = async orderId => {
                     </NuxtLink>
                 </div>
             </div>
+            <div v-else style="color: azure">您暫時無訂單!</div>
         </div>
         <div class="col-12 col-md-5">
             <div

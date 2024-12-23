@@ -12,9 +12,9 @@ const registrationFormData = ref({
     password: '',
     phone: '',
     birthday: {
-        year: null,
-        month: null,
-        day: null,
+        year: 2000,
+        month: 1,
+        day: 1,
     },
     address: {
         zipcode: null,
@@ -25,7 +25,7 @@ const registrationFormData = ref({
 const postSingUp = async request => {
     try {
         isEnabled.value = true;
-        const { year, month, day } = registrationFormData.birthday;
+        const { year, month, day } = request.birthday;
 
         await $fetch('/api/v1/user/signup', {
             method: 'POST',
@@ -39,6 +39,7 @@ const postSingUp = async request => {
 
         navigateTo('/account/login');
     } catch (error) {
+        console.dir(error)
         const { message } = error.response._data;
 
         await setSwal('error', message);
@@ -47,8 +48,7 @@ const postSingUp = async request => {
             ? navigateTo('/account/login')
             : navigateTo('/account/signup');
     } finally {
-        registrationFormData.value = {}; // 清空註冊表單
-        isEnabled.value = false; // 解鎖按鈕
+        isEnabled.value = false;
     }
 };
 

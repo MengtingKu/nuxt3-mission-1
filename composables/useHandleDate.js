@@ -19,7 +19,7 @@ export const useHandleDate = () => {
 
     const filterHistoryOrders = ordersList =>
         ordersList.filter(order =>
-            $dayjs(order.checkInDate).isBefore(today, 'day')
+            $dayjs(today).isBefore(order.checkInDate, 'day')
         );
 
     const findClosestOrder = ordersList =>

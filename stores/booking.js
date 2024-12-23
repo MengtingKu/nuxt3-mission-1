@@ -54,10 +54,7 @@ export const useBookingStore = defineStore('booking', () => {
 
             setSwal('success', '登入成功');
 
-            await Promise.allSettled([
-                getUserInfo(),
-                getOrders(),
-            ]);
+            await Promise.allSettled([getUserInfo(), getOrders()]);
             navigateTo(`${linkTo(from, userDetailInfo.value._id)}`);
         } catch (error) {
             setSwal('error', '資料錯誤請重新登入');

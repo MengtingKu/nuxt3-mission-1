@@ -26,7 +26,6 @@ onMounted(async () => {
         await bookingStore.getOrders();
     }
     userOrders.value = ordersList.value;
-    console.log('userOrders.value=>', userOrders.value);
 });
 
 const historyOrders = computed(() => {
@@ -58,7 +57,6 @@ const viewMoreOrders = () => {
 
 // 取消訂單
 const cancelOrder = async orderId => {
-    console.log('orderId=>', orderId);
     await bookingStore.deleteOrder(orderId);
 
     userOrders.value = userOrders.value.filter(order => order._id !== orderId);

@@ -39,7 +39,6 @@ const postSingUp = async request => {
 
         navigateTo('/account/login');
     } catch (error) {
-        console.dir(error)
         const { message } = error.response._data;
 
         await setSwal('error', message);

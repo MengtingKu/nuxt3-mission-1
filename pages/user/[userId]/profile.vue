@@ -1,7 +1,7 @@
 <script setup>
 const isEditPassword = ref(false);
 const isEditProfile = ref(false);
-const { findAreaByZipCode } = useConversionZip();
+const { updateZipCode, findAreaByZipCode } = useConversionZip();
 
 // store
 const bookingStore = useBookingStore();
@@ -36,10 +36,8 @@ onMounted(() => {
 
 // 忘記密碼 & 更新使用者資訊
 const showError = ref(false);
-
-const resetData = computed(() => {
-    return { ...resetInfo.value, ...userDetailInfo.value };
-});
+const selectedCity = ref('');
+const selectedDistrict = ref('');
 
 const checkPasswords = () => {
     if (resetInfo.value.newPassword && resetInfo.value.confirmPassword) {
@@ -48,19 +46,47 @@ const checkPasswords = () => {
     }
 };
 
+const formatBirthday = birthday => {
+    if (birthday.year && birthday.month && birthday.day) {
+        return `${birthday.year}/${parseInt(birthday.month, 10)}/${
+            birthday.day.split(' ')[0]
+        }`;
+    }
+
+    return null;
+};
+
 const reset = async (from = 'password') => {
     if (accountToken.value || !userDetailInfo.value) {
         await bookingStore.getUserInfo();
     }
 
-    delete resetData.value.confirmPassword;
-    delete resetData.value.updatedAt;
-    delete resetData.value.createdAt;
+    const resetData = {
+        userId: userDetailInfo.value._id,
+        name: resetInfo.value.name || userDetailInfo.value.name,
+        phone: resetInfo.value.phone || userDetailInfo.value.phone,
+        birthday:
+            formatBirthday(resetInfo.value.birthday) ||
+            userDetailInfo.value.birthday,
+        address: {
+            zipcode:
+                resetInfo.value.address.zipcode !== null
+                    ? updateZipCode(selectedCity.value, selectedDistrict.value)
+                    : userDetailInfo.value.address.zipcode,
+            detail:
+                resetInfo.value.address.detail !== ''
+                    ? resetInfo.value.address.detail
+                    : userDetailInfo.value.address.detail,
+        },
+    };
+    delete resetData.confirmPassword;
+    delete resetData.updatedAt;
+    delete resetData.createdAt;
     if (from === 'baseInfo') {
-        delete resetData.value.oldPassword;
-        delete resetData.value.newPassword;
+        delete resetData.oldPassword;
+        delete resetData.newPassword;
     }
-    await bookingStore.forgetPassword(resetData.value);
+    await bookingStore.forgetPassword(resetData);
     isEditProfile.value = false;
 };
 
@@ -101,7 +127,7 @@ useSeoMeta({
                             <input
                                 class="form-control pe-none p-0 text-neutral-100 fs-5 fs-md-3 fw-bold border-0"
                                 type="password"
-                                :value="userDetailInfo.email"
+                                v-model="userDetailInfo.email"
                             />
                         </div>
 
@@ -168,24 +194,24 @@ useSeoMeta({
                             </small>
                         </div>
                     </div>
-                        <button
-                            :class="{ 'd-none': !isEditPassword }"
-                            class="btn btn-outline-neutral-100 align-self-md-start px-8 py-3 text-neutral-60 rounded-3 w-75 ms-auto"
-                            type="button"
-                            :disabled="!showError && !resetInfo.oldPassword"
-                            @click="reset()"
-                        >
-                            儲存設定
-                        </button>
-                        
-                        <button
-                            :class="{ 'd-none': !isEditPassword }"
-                            class="btn btn-neutral-100 align-self-md-start px-8 py-3 text-neutral-0 rounded-3 w-75 ms-auto"
-                            type="button"
-                            @click="isEditPassword = !isEditPassword"
-                        >
-                            取消
-                        </button>
+                    <button
+                        :class="{ 'd-none': !isEditPassword }"
+                        class="btn btn-outline-neutral-100 align-self-md-start px-8 py-3 text-neutral-60 rounded-3 w-75 ms-auto"
+                        type="button"
+                        :disabled="!showError && !resetInfo.oldPassword"
+                        @click="reset()"
+                    >
+                        儲存設定
+                    </button>
+
+                    <button
+                        :class="{ 'd-none': !isEditPassword }"
+                        class="btn btn-neutral-100 align-self-md-start px-8 py-3 text-neutral-0 rounded-3 w-75 ms-auto"
+                        type="button"
+                        @click="isEditPassword = !isEditPassword"
+                    >
+                        取消
+                    </button>
                 </div>
             </section>
         </div>
@@ -216,7 +242,7 @@ useSeoMeta({
                                 'p-4': isEditProfile,
                             }"
                             type="text"
-                            :value="userDetailInfo.name"
+                            v-model="userDetailInfo.name"
                         />
                     </div>
 
@@ -240,7 +266,7 @@ useSeoMeta({
                                 'p-4': isEditProfile,
                             }"
                             type="tel"
-                            :value="userDetailInfo.phone"
+                            v-model="userDetailInfo.phone"
                         />
                     </div>
 
@@ -320,32 +346,28 @@ useSeoMeta({
                         </label>
                         <span
                             class="form-control pe-none p-0 text-neutral-100 fw-bold border-0"
-                            :class="{ 'd-none': isEditProfile }"
+                            :class="{ 'd-none': isEditProfile || ! userDetailInfo.address?.zipcode }"
                             >{{
-                                `${findAreaByZipCode(
-                                    userDetailInfo.address?.zipcode
-                                )}${userDetailInfo.address?.detail}`
-                            }}</span
-                        >
+                                `${findAreaByZipCode(userDetailInfo.address?.zipcode)}${userDetailInfo.address?.detail}`
+                            }}
+                        </span>
                         <div :class="{ 'd-none': !isEditProfile }">
                             <div class="d-flex gap-2 mb-2">
                                 <select
                                     class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                                    v-model="selectedCity"
                                 >
                                     <option value="臺北市">臺北市</option>
                                     <option value="臺中市">臺中市</option>
-                                    <option selected value="高雄市">
-                                        高雄市
-                                    </option>
+                                    <option value="高雄市">高雄市</option>
                                 </select>
                                 <select
                                     class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+                                    v-model="selectedDistrict"
                                 >
                                     <option value="前金區">前金區</option>
                                     <option value="鹽埕區">鹽埕區</option>
-                                    <option selected value="新興區">
-                                        新興區
-                                    </option>
+                                    <option value="新興區">新興區</option>
                                 </select>
                             </div>
                             <input

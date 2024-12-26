@@ -76,7 +76,6 @@ export const useBookingStore = defineStore('booking', () => {
                 body: {
                     ...resetData,
                     birthday: `${formateApiDate(resetData.birthday)}`,
-                    userId: resetData._id,
                 },
             });
             await getUserInfo();

@@ -119,7 +119,7 @@ const logout = () => {
                                         class="fs-5"
                                         icon="mdi:account-circle-outline"
                                     />
-                                    {{ `${user || '會員專區'}` }}
+                                    {{ `${user || '會員登入'}` }}
                                 </button>
                                 <ul
                                     class="dropdown-menu py-3 overflow-hidden"
